@@ -1,0 +1,34 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	google_search(google_search)
+	bing_search(bing_search)
+	reddit_search(reddit_search)
+	retrieve_reddit_posts(retrieve_reddit_posts)
+	analyze_reddit_posts(analyze_reddit_posts)
+	analyze_google_results(analyze_google_results)
+	analyze_bing_results(analyze_bing_results)
+	analyze_reddit_results(analyze_reddit_results)
+	synthesize_analysis(synthesize_analysis)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> bing_search;
+	__start__ --> google_search;
+	__start__ --> reddit_search;
+	analyze_bing_results --> synthesize_analysis;
+	analyze_google_results --> synthesize_analysis;
+	analyze_reddit_posts --> retrieve_reddit_posts;
+	analyze_reddit_results --> synthesize_analysis;
+	bing_search --> analyze_reddit_posts;
+	google_search --> analyze_reddit_posts;
+	reddit_search --> analyze_reddit_posts;
+	retrieve_reddit_posts --> analyze_bing_results;
+	retrieve_reddit_posts --> analyze_google_results;
+	retrieve_reddit_posts --> analyze_reddit_results;
+	synthesize_analysis --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
