@@ -1,10 +1,14 @@
+import json
 from dotenv import load_dotenv
 import os
 import requests
 from urllib.parse import quote_plus
 
+from snapshot_operations import poll_snapshot_status, download_snapshot
+
 load_dotenv()
 
+dataset_id = "gd_lvz8ah06191smkebj4"
 
 def _make_api_request(url, **kwargs):
 
@@ -57,3 +61,53 @@ def serp_search(query, engine="google"):
 
     return extracted_data
 
+
+def _trigger_and_download_snapshot(trigger_url, params, data, operation_name="operation"):
+    trigger_response = _make_api_request(trigger_url, params=params, json=data)
+    if not trigger_response:
+        return None
+    
+    snapshot_id = trigger_response.get("snapshot_id")
+    if not snapshot_id:
+        return None
+
+    if not poll_snapshot_status(snapshot_id):
+        return None
+    
+    return download_snapshot(snapshot_id)
+
+
+def reddit_search_api(keyword, date="All time", sort_by="Hot", num_of_posts=75):
+    trigger_url = f"https://api.brightdata.com/datasets/v3/trigger"
+
+    params = {
+        "datasetId": dataset_id,
+        "include_errors": True,
+        "type": "discover_new",
+        "discover_by": "keyword",
+    }
+
+    data = [
+        {
+            "keyword": keyword,
+            "date": date,
+            "sort_by": sort_by,
+            "num_of_posts": num_of_posts,
+        }
+    ]
+
+    raw_data = _trigger_and_download_snapshot(trigger_url, params, data, operation_name="reddit_search")
+
+    if not raw_data:
+        return None
+    
+    parsed_data = []
+    
+    for item in raw_data:
+        parsed_data.append({
+            "title": item.get("title"),
+            "url": item.get("url"),
+            "content": item.get("content", ""),
+        })
+    
+    return {"parsed_data": parsed_data, "total_found": len(parsed_data)}

@@ -7,7 +7,7 @@ from langchain_groq import ChatGroq
 from typing_extensions import TypedDict
 from pydantic import BaseModel, Field
 
-from web_operations import serp_search
+from web_operations import serp_search, reddit_search_api
 # from .visualize import export_graph_visualizations
 
 load_dotenv()
@@ -53,9 +53,8 @@ def reddit_search(state: State):
     user_question = state.get("user_question", "")
     print(f"Searching Reddit for: {user_question}")
 
-    time.sleep(2)
-
-    reddit_results = []
+    reddit_results = reddit_search_api(user_question)
+    print(reddit_results)
 
     return {"reddit_results": reddit_results}
 
