@@ -59,11 +59,11 @@ def reddit_search(state: State):
     return {"reddit_results": reddit_results}
 
 
-def retrieve_reddit_posts(state: State):
-    return {"reddit_post_data": []}
-
 def analyze_reddit_posts(state: State):
     return {"selected_reddit_urls": []}
+
+def retrieve_reddit_posts(state: State):
+    return {"reddit_post_data": []}
 
 def analyze_google_results(state: State):
     return {"google_analysis": ""}
