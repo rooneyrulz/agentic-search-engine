@@ -144,10 +144,8 @@ def reddit_post_retrieval(urls, days_back=10, load_all_replies=False, comment_li
     for item in raw_data:
         parsed_comments.append({
             "comment_id": item.get("comment_id"),
-            "content": item.get("content", ""),
-            "date": item.get("date"),
-            "parent_comment_id": item.get("parent_comment_id"),
-            "post_title": item.get("post_title"),
+            "content": item.get("comment", ""),
+            "date": item.get("date_posted")
         })
 
     return {"comments": parsed_comments, "total_found": len(parsed_comments)}
