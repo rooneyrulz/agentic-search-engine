@@ -13,8 +13,9 @@ from prompts import (
     get_google_analysis_messages,
     get_bing_analysis_messages,
     get_reddit_url_analysis_messages,
-    get_synthesis_messages
+    get_synthesis_messages,
 )
+
 # from .visualize import export_graph_visualizations
 
 load_dotenv()
@@ -23,6 +24,7 @@ load_dotenv()
 def get_llm() -> ChatGroq:
     """Lazily construct the LLM when needed by nodes, avoiding init at import time."""
     return ChatGroq(model="deepseek-r1-distill-llama-70b")
+
 
 class State(TypedDict):
     messages: Annotated[list, add_messages]
@@ -37,8 +39,11 @@ class State(TypedDict):
     reddit_analysis: str | None
     final_answer: str | None
 
+
 class RedditURLAnalysis(BaseModel):
-    selected_urls: List[str] = Field(description="List of Reddit URLs that contain valuable information for answering the user's question")
+    selected_urls: List[str] = Field(
+        description="List of Reddit URLs that contain valuable information for answering the user's question"
+    )
 
 
 def google_search(state: State):
@@ -50,6 +55,7 @@ def google_search(state: State):
 
     return {"google_results": google_results}
 
+
 def bing_search(state: State):
     user_question = state.get("user_question", "")
     print(f"Searching Bing for: {user_question}")
@@ -58,6 +64,7 @@ def bing_search(state: State):
     print(bing_results)
 
     return {"bing_results": bing_results}
+
 
 def reddit_search(state: State):
     user_question = state.get("user_question", "")
@@ -93,6 +100,7 @@ def analyze_reddit_posts(state: State):
 
     return {"selected_reddit_urls": selected_urls}
 
+
 def retrieve_reddit_posts(state: State):
     print("Getting reddit post comments")
 
@@ -114,17 +122,65 @@ def retrieve_reddit_posts(state: State):
     print(reddit_post_data)
     return {"reddit_post_data": reddit_post_data}
 
+
 def analyze_google_results(state: State):
-    return {"google_analysis": ""}
+    print("Analyzing google search results")
+
+    user_question = state.get("user_question", "")
+    google_results = state.get("google_results", "")
+
+    messages = get_google_analysis_messages(user_question, google_results)
+    reply = get_llm().invoke(messages)
+
+    return {"google_analysis": reply.content}
+
 
 def analyze_bing_results(state: State):
-    return {"bing_analysis": ""}
+    print("Analyzing bing search results")
+
+    user_question = state.get("user_question", "")
+    bing_results = state.get("bing_results", "")
+
+    messages = get_bing_analysis_messages(user_question, bing_results)
+    reply = get_llm().invoke(messages)
+
+    return {"bing_analysis": reply.content}
+
 
 def analyze_reddit_results(state: State):
-    return {"reddit_analysis": ""}
+    print("Analyzing reddit search results")
+
+    user_question = state.get("user_question", "")
+    reddit_results = state.get("reddit_results", "")
+    reddit_post_data = state.get("reddit_post_data", "")
+
+    messages = get_reddit_analysis_messages(
+        user_question, reddit_results, reddit_post_data
+    )
+    reply = get_llm().invoke(messages)
+
+    return {"reddit_analysis": reply.content}
+
 
 def synthesize_analysis(state: State):
-    return {"final_answer": ""}
+    print("Combine all results together")
+
+    user_question = state.get("user_question", "")
+    google_analysis = state.get("google_analysis", "")
+    bing_analysis = state.get("bing_analysis", "")
+    reddit_analysis = state.get("reddit_analysis", "")
+
+    messages = get_synthesis_messages(
+        user_question, google_analysis, bing_analysis, reddit_analysis
+    )
+
+    reply = get_llm().invoke(messages)
+    final_answer = reply.content
+
+    return {
+        "final_answer": final_answer,
+        "messages": [{"role": "assistant", "content": final_answer}],
+    }
 
 
 graph_builder = StateGraph(State)
@@ -161,6 +217,7 @@ graph_builder.add_edge("synthesize_analysis", END)
 
 graph = graph_builder.compile()
 
+
 def run_chatbot():
     print("Multi-source Research Agent")
     print("Enter 'quit' to exit\n")
@@ -170,14 +227,9 @@ def run_chatbot():
         if user_input.lower() == "quit":
             print("Goodbye!")
             break
-        
+
         state = {
-            "messages": [
-                {
-                    "role": "user",
-                    "content": user_input
-                }
-            ],
+            "messages": [{"role": "user", "content": user_input}],
             "user_question": user_input,
             "google_results": None,
             "bing_results": None,
@@ -187,16 +239,16 @@ def run_chatbot():
             "google_analysis": None,
             "bing_analysis": None,
             "reddit_analysis": None,
-            "final_answer": None
+            "final_answer": None,
         }
 
         print("\n Starting parellel research process...\n")
         print("Launching Google, Bing, and Reddit searches...\n")
-        
+
         final_state = graph.invoke(state)
         if final_state.get("final_answer"):
             print(f"\n Final Answer: {final_state.get('final_answer')}\n")
-        
+
         print("-" * 80)
 
 
