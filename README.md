@@ -1,219 +1,220 @@
-Advanced Search Engine
-A sophisticated multi-source search engine that combines Google, Bing, and Reddit data to provide comprehensive, AI-powered research and analysis. Built with Python and LangGraph, this tool synthesizes information from multiple search engines and social media platforms to deliver well-rounded answers.
+# Advanced Search Engine 🔍
 
-🚀 Features
-Multi-Source Search: Simultaneously query Google, Bing, and Reddit
+A sophisticated AI-powered research assistant that combines multiple search sources (Google, Bing, Reddit) with LLM analysis to provide comprehensive, multi-perspective answers to user queries.
 
-AI-Powered Analysis: Advanced LLM processing of search results
+## Overview
 
-Structured Synthesis: Combines insights from different sources into cohesive answers
+This project leverages the power of LangGraph and LLMs to orchestrate parallel web searches across different platforms, analyze results intelligently, and synthesize findings into cohesive, well-researched answers. It's designed to provide balanced perspectives by incorporating both authoritative sources and community insights.
 
-Reddit Integration: Deep analysis of Reddit discussions and community insights
+## Architecture
 
-Bright Data Integration: Professional web scraping and data collection
+![System Flow](graph.png)
 
-LangGraph Workflow: Orchestrated search and analysis pipeline
+The system uses a graph-based workflow that:
+1. Accepts user queries
+2. Performs parallel searches across Google, Bing, and Reddit
+3. Analyzes results from each source independently
+4. Synthesizes all findings into a comprehensive answer
 
-🏗️ Architecture
-The system uses a sophisticated node-based architecture to process search queries through multiple stages:
+## Features
 
-https://graph.png
+- **Multi-Source Search**: Simultaneous queries across Google, Bing, and Reddit
+- **Intelligent Analysis**: LLM-powered extraction of key insights from each source
+- **Reddit Deep Dive**: Identifies valuable Reddit posts and retrieves detailed discussions
+- **Smart Synthesis**: Combines insights from all sources while identifying conflicts and consensus
+- **Source Attribution**: Clear citation of where information originates (Google/Bing/Reddit)
+- **Community Insights**: Incorporates real user experiences and opinions from Reddit
 
-Node Flow:
-Search Orchestration - Coordinates parallel search operations
+## Technology Stack
 
-Google Search & Analysis - Extracts factual information and authoritative sources
+- **LangChain**: LLM orchestration and prompt management
+- **LangGraph**: Workflow orchestration and state management
+- **Groq**: Fast LLM inference
+- **Bright Data API**: Web scraping for search results and Reddit data
+- **Python 3.12+**: Core language
 
-Bing Search & Analysis - Gathers complementary perspectives and technical details
+## Prerequisites
 
-Reddit Search & Analysis - Captures community insights and user experiences
+- Python 3.12 or higher
+- Bright Data API account and API key
+- Groq API key
 
-Final Synthesis - Combines all analyses into comprehensive answers
+## Installation
 
-📋 Prerequisites
-Python 3.12 or higher
+1. Clone the repository:
+```bash
+git clone https://github.com/rooneyrulz/agentic-search-engine
+cd agentic-search-engine
+```
 
-Bright Data account and API key
+2. Install dependencies using `uv` or `pip`:
+```bash
+# Using uv (recommended)
+uv pip install -e .
 
-Groq API key
-
-🛠️ Installation
-Clone the repository:
-
-bash
-git clone <your-repo-url>
-cd advanced-search-engine
-Install dependencies:
-
-bash
+# Or using pip
 pip install -e .
-Set up environment variables:
-Create a .env file in the root directory:
+```
 
-env
-BRIGHTDATA_API_KEY=your_bright_data_api_key_here
+3. Create a `.env` file in the root directory:
+```env
+BRIGHTDATA_API_KEY=your_brightdata_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
-🔧 Usage
-Basic Search
-python
-from advanced_search_engine import SearchEngine
+```
 
-# Initialize the search engine
-engine = SearchEngine()
+## Project Structure
 
-# Perform a comprehensive search
-results = engine.search("What are the best programming languages for AI development in 2024?")
-print(results)
-Advanced Configuration
-python
-from advanced_search_engine import SearchEngine, SearchConfig
-
-config = SearchConfig(
-    max_reddit_posts=50,
-    include_comments=True,
-    search_engines=['google', 'bing', 'reddit'],
-    analysis_depth='detailed'
-)
-
-engine = SearchEngine(config=config)
-results = engine.search("Your query here")
-📁 Project Structure
-text
+```
 advanced-search-engine/
-├── pyproject.toml          # Project configuration and dependencies
-├── prompts.py              # LLM prompt templates and management
-├── web_operations.py       # Search engine and API integrations
-├── snapshot_operations.py  # Bright Data snapshot management
-├── graph.png              # System architecture diagram
-└── README.md              # This file
-Key Modules
-prompts.py
-Contains all LLM prompt templates for:
+├── prompts.py              # LLM prompt templates for different analysis stages
+├── web_operations.py       # API interactions for search and data retrieval
+├── snapshot_operations.py  # Bright Data snapshot polling and downloading
+├── graph.png              # System architecture flowchart
+├── pyproject.toml         # Project dependencies and metadata
+├── .env                   # Environment variables (create this)
+└── README.md             # This file
+```
 
-Google Analysis: Factual information and authoritative sources
+## Core Components
 
-Bing Analysis: Technical details and complementary perspectives
+### 1. Prompt Templates (`prompts.py`)
 
-Reddit Analysis: Community insights and user experiences
+Manages all LLM prompts for different analysis stages:
+- **Reddit URL Analysis**: Identifies valuable Reddit posts from search results
+- **Google Analysis**: Extracts factual information from Google results
+- **Bing Analysis**: Finds complementary insights from Bing
+- **Reddit Analysis**: Analyzes community discussions and user experiences
+- **Synthesis**: Combines all analyses into a comprehensive answer
 
-Synthesis: Combining multiple sources into cohesive answers
+### 2. Web Operations (`web_operations.py`)
 
-web_operations.py
-Handles search operations across different platforms:
+Handles all external API interactions:
+- `serp_search(query, engine)`: Performs Google or Bing searches
+- `reddit_search_api(keyword, ...)`: Searches Reddit for relevant posts
+- `reddit_post_retrieval(urls, ...)`: Retrieves detailed post and comment data
 
-Google SERP search with knowledge graph extraction
+### 3. Snapshot Operations (`snapshot_operations.py`)
 
-Bing search with enterprise perspectives
+Manages asynchronous data retrieval:
+- `poll_snapshot_status(snapshot_id)`: Monitors data collection progress
+- `download_snapshot(snapshot_id)`: Downloads completed data snapshots
 
-Reddit search and post retrieval
+## Usage Example
 
-Bright Data API integration
+```python
+from your_main_module import ResearchAssistant
 
-snapshot_operations.py
-Manages Bright Data snapshot operations:
+# Initialize the assistant
+assistant = ResearchAssistant()
 
-Snapshot status polling and monitoring
+# Ask a question
+question = "What are the pros and cons of remote work?"
+answer = assistant.research(question)
 
-Data download and processing
+print(answer)
+```
 
-Error handling and retry logic
+The system will:
+1. Search Google, Bing, and Reddit simultaneously
+2. Analyze Reddit results to find valuable posts
+3. Retrieve detailed discussions from selected posts
+4. Analyze findings from each source
+5. Synthesize everything into a comprehensive answer with citations
 
-🔍 Search Capabilities
-Google Search
-Extracts knowledge graph information
+## Configuration
 
-Processes organic search results
+### Reddit Search Parameters
 
-Focuses on authoritative sources and official documentation
+- `date`: Time range for posts ("All time", "Past year", etc.)
+- `sort_by`: Sorting method ("Hot", "Top", "New", "Relevance")
+- `num_of_posts`: Number of posts to retrieve (default: 75)
 
-Bing Search
-Captures Microsoft ecosystem perspectives
+### Reddit Post Retrieval Parameters
 
-Gathers technical documentation
+- `days_back`: How far back to look for comments (default: 10)
+- `load_all_replies`: Whether to load all nested replies
+- `comment_limit`: Maximum comments to retrieve per post
 
-Provides complementary insights to Google results
+## API Integration
 
-Reddit Integration
-Keyword-based Reddit search across multiple subreddits
+### Bright Data
 
-Post content extraction and analysis
+This project uses Bright Data's Web Scraping API for:
+- SERP (Search Engine Results Page) scraping
+- Reddit search and data collection
+- Automated snapshot management
 
-Comment retrieval and community sentiment analysis
+Dataset ID: `gd_lvz8ah06191smkebj4`
 
-Real user experiences and practical insights
+### Groq
 
-🎯 Prompt Strategy
-The system uses specialized prompts for each search source:
+Fast LLM inference for all analysis and synthesis tasks.
 
-Google: Factual accuracy and authoritative sources
+## How It Works
 
-Bing: Technical depth and enterprise perspectives
+### Search Flow
 
-Reddit: Community consensus and real-world experiences
+1. **Parallel Search**: Queries are sent to Google, Bing, and Reddit simultaneously
+2. **Reddit URL Selection**: LLM analyzes Reddit search results to identify the most valuable posts
+3. **Deep Retrieval**: Selected Reddit posts are fetched with their comments
+4. **Independent Analysis**: Each source is analyzed separately with specialized prompts
+5. **Synthesis**: All analyses are combined into a final, comprehensive answer
 
-Synthesis: Balanced multi-perspective analysis
+### Analysis Strategy
 
-📊 Output Format
-The search engine returns structured analysis including:
+- **Google**: Focus on authoritative sources, facts, and official information
+- **Bing**: Capture complementary perspectives and technical details
+- **Reddit**: Extract real user experiences, community consensus, and practical advice
 
-Executive Summary: High-level answer synthesis
+## Error Handling
 
-Source Analysis: Breakdown by search engine
+The system includes robust error handling for:
+- API request failures
+- Timeout scenarios during data collection
+- Missing or incomplete data
+- Network issues
 
-Key Insights: Main findings from each source
+## Development
 
-Conflicting Information: Areas where sources disagree
+### Adding New Search Sources
 
-Community Perspectives: Reddit insights and user experiences
+1. Create new API integration in `web_operations.py`
+2. Add analysis prompts in `prompts.py`
+3. Update the LangGraph workflow to include the new source
+4. Add synthesis logic for the new data
 
-Citations: Source attribution for key claims
+### Customizing Prompts
 
-🔐 API Keys Required
-Bright Data: For web scraping and search operations
+All prompts are centralized in `prompts.py` using the `PromptTemplates` class. Modify the methods to adjust analysis behavior.
 
-Groq: For LLM processing and analysis
+## Limitations
 
-🚀 Performance Features
-Parallel Processing: Simultaneous search across multiple engines
+- Requires active Bright Data and Groq API subscriptions
+- Rate limited by API quotas
+- Reddit data retrieval can be time-consuming for large result sets
+- LLM costs scale with query complexity
 
-Intelligent Caching: Optimized API usage
+## Contributing
 
-Error Resilience: Robust error handling and retry mechanisms
+Contributions are welcome! Please feel free to submit issues or pull requests.
 
-Progress Tracking: Real-time operation monitoring
+## License
 
-🤝 Contributing
-Fork the repository
+[MIT]
 
-Create a feature branch (git checkout -b feature/amazing-feature)
+## Acknowledgments
 
-Commit your changes (git commit -m 'Add some amazing feature')
+- Built with LangChain and LangGraph
+- Powered by Groq for fast LLM inference
+- Data sourced via Bright Data APIs
 
-Push to the branch (git push origin feature/amazing-feature)
+## Support
 
-Open a Pull Request
+For issues and questions:
+- Open an issue on GitHub
+- Check Bright Data documentation: https://docs.brightdata.com
+- Review LangGraph docs: https://langchain-ai.github.io/langgraph/
 
-📝 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
 
-🆘 Support
-For support and questions:
-
-Open an issue on GitHub
-
-Check the documentation
-
-Review the architecture diagram for workflow understanding
-
-🔄 Future Enhancements
-Additional search engine integrations
-
-Custom source weighting
-
-Real-time search updates
-
-Advanced filtering options
-
-Export capabilities (PDF, JSON, CSV)
-
-Note: This tool is designed for research and educational purposes. Please ensure compliance with terms of service for all integrated platforms and respect rate limits and usage policies.
+**Note**: This is an AI research tool. Always verify critical information from primary sources.
